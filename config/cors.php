@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
+    // Comma-separated FRONTEND_URLS is preferred in production; FRONTEND_URL remains as fallback.
+    'allowed_origins' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', env('FRONTEND_URLS', env('FRONTEND_URL', 'http://localhost:3000')))
+    ))),
 
     'allowed_origins_patterns' => [],
 
