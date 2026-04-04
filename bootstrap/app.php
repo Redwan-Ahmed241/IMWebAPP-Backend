@@ -21,7 +21,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Force JSON responses — never try to render HTML views (Vercel has no view engine)
+        $exceptions->shouldRenderJsonWhen(fn () => true);
     })->create();
 
 // Vercel read-only filesystem fix
