@@ -13,12 +13,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
-        
-        // Apply CORS to all routes
+        // Apply CORS middleware to API routes first (before other middleware)
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
+        
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

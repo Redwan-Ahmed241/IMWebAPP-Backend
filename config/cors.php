@@ -19,13 +19,16 @@ return [
 
     'allowed_methods' => ['*'],
 
-    // Comma-separated FRONTEND_URLS is preferred in production; FRONTEND_URL remains as fallback.
-    'allowed_origins' => array_values(array_filter(array_map(
-        'trim',
-        explode(',', env('FRONTEND_URLS', env('FRONTEND_URL', 'http://localhost:3000')))
-    ))),
+    'allowed_origins' => [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'https://idealmuslimshop.netlify.app',
+        env('FRONTEND_URL', 'http://localhost:3000'),
+    ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https://.*\.netlify\.app$#', // Allow all Netlify preview deployments
+    ],
 
     'allowed_headers' => ['*'],
 
