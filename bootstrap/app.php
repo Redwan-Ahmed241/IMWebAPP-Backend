@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
+        // We use stateless Bearer tokens, so no stateful/SPA middleware needed
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Force JSON responses for API — this is a pure API backend
