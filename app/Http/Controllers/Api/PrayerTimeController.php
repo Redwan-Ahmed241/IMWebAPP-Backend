@@ -3,63 +3,61 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\PrayerTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 /**
- * PrayerTimeController — serves prayer times from the database.
- *
- * The frontend expects:
- * {
- *   "data": {
- *     "city": "Dhaka",
- *     "date": "2025-02-15",
- *     "prayers": {
- *       "Fajr": "05:12",
- *       "Sunrise": "06:30",
- *       ...
- *     }
- *   }
- * }
+ * PrayerTimeController — fetches real-time prayer times from Aladhan API.
  */
 class PrayerTimeController extends Controller
 {
     public function index(Request $request)
     {
         $city = $request->input('city', 'Dhaka');
-        $date = $request->input('date', now()->toDateString());
+        $country = $request->input('country', 'Bangladesh');
 
-        $prayerTime = PrayerTime::where('city', $city)
-            ->where('date', $date)
-            ->first();
+        // Cache the prayer times for 24 hours based on city and date to save API calls
+        $cacheKey = "prayer_times_" . strtolower($city) . "_" . strtolower($country) . "_" . now()->toDateString();
 
-        if (!$prayerTime) {
-            // Fall back to latest available for the city
-            $prayerTime = PrayerTime::where('city', $city)
-                ->latest('date')
-                ->first();
-        }
+        $prayerTimeData = Cache::remember($cacheKey, now()->addHours(24), function () use ($city, $country) {
+            $response = Http::timeout(10)->get('http://api.aladhan.com/v1/timingsByCity', [
+                'city' => $city,
+                'country' => $country,
+                'method' => 1 // 1: University of Islamic Sciences, Karachi (Common in South Asia)
+            ]);
 
-        if (!$prayerTime) {
+            if ($response->successful() && isset($response['data']['timings'])) {
+                $timings = $response['data']['timings'];
+                
+                // Format the Aladhan response to match our frontend UI structure
+                return [
+                    'city' => ucfirst($city),
+                    'date' => now()->format('Y-m-d'),
+                    'prayers' => [
+                        'Fajr' => $timings['Fajr'],
+                        'Sunrise' => $timings['Sunrise'],
+                        'Dhuhr' => $timings['Dhuhr'],
+                        'Asr' => $timings['Asr'],
+                        'Maghrib' => $timings['Maghrib'],
+                        'Isha' => $timings['Isha'],
+                    ],
+                ];
+            }
+
+            return null; // Triggers 404 block below if API fails
+        });
+
+        if (!$prayerTimeData) {
             return response()->json([
                 'data' => null,
-                'message' => 'No prayer times found. Please seed the database.',
+                'message' => 'Failed to fetch prayer times from Aladhan API.',
             ], 404);
         }
 
         return response()->json([
-            'data' => [
-                'city' => $prayerTime->city,
-                'date' => $prayerTime->date->format('Y-m-d'),
-                'prayers' => [
-                    'Fajr' => $prayerTime->fajr,
-                    'Sunrise' => $prayerTime->sunrise,
-                    'Dhuhr' => $prayerTime->dhuhr,
-                    'Asr' => $prayerTime->asr,
-                    'Maghrib' => $prayerTime->maghrib,
-                    'Isha' => $prayerTime->isha,
-                ],
-            ],
+            'data' => $prayerTimeData
         ]);
     }
 }
+
