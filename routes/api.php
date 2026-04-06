@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\PrayerTimeController;
 use App\Http\Controllers\Api\DailyAyahController;
+use App\Http\Controllers\Api\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,7 @@ Route::prefix('auth')->group(function () {
 Route::apiResource('products',   ProductController::class)->only(['index', 'show']);
 Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 Route::apiResource('articles',   ArticleController::class)->only(['index', 'show']);
+Route::post('/orders', [OrderController::class, 'store']);
 
 Route::get('/prayer-times', [PrayerTimeController::class, 'index']);
 
