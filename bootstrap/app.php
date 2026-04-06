@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
         // We use stateless Bearer tokens, so no stateful/SPA middleware needed
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // Force JSON responses for API — this is a pure API backend
-        $exceptions->shouldRenderJsonWhen(fn () => true);
+        // Force JSON responses ONLY for API
+        $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
     })->create();
