@@ -23,9 +23,9 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('category_id')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Select::make('category_id')
+                    ->relationship('category', 'name')
+                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -39,8 +39,8 @@ class ProductResource extends Resource
                     ->numeric()
                     ->default(0)
                     ->prefix('$'),
-                Forms\Components\FileUpload::make('image_url')
-                    ->image(),
+                Forms\Components\TextInput::make('image_url')
+                    ->maxLength(255),
                 Forms\Components\Toggle::make('is_featured')
                     ->required(),
                 Forms\Components\TextInput::make('stock')
@@ -62,7 +62,6 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
-                    ->money()
                     ->sortable(),
                 Tables\Columns\ImageColumn::make('image_url'),
                 Tables\Columns\IconColumn::make('is_featured')
