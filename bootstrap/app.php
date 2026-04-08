@@ -14,7 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // We use stateless Bearer tokens, so no stateful/SPA middleware needed
+        // Trust Railway's reverse proxy for correct HTTPS asset generation
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Force JSON responses ONLY for API
