@@ -39,9 +39,19 @@ class ProductController extends Controller
 
         // Limit
         $limit = $request->input('limit', 20);
-        $products = $query->latest()->take($limit)->get();
+        
+        // Setup cache key based on the full URL (including all query parameters)
+        $cacheKey = 'products_' . md5($request->fullUrl());
 
-        return ProductResource::collection($products);
+        // Cache the database result for 1 hour to protect database limits
+        $products = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60 * 60, function () use ($query, $limit) {
+            return $query->latest()->take($limit)->get();
+        });
+
+        // Return with 'Cache-Control' so the user's browser also caches it for 60 seconds (stops refresh spam)
+        return ProductResource::collection($products)
+            ->response()
+            ->header('Cache-Control', 'public, max-age=60');
     }
 
     public function show(Product $product)
