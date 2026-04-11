@@ -4,7 +4,7 @@
  * API Routes
  *
  * Architecture note:
- * - Public routes: products, articles, prayer times, daily-ayah
+ * - Public routes: products, articles, prayer times, daily-ayah, blood-donations
  * - Protected routes: auth/logout (requires Sanctum token)
  * - Auth routes: login + register (public)
  */
@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\PrayerTimeController;
 use App\Http\Controllers\Api\DailyAyahController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\BloodDonationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,3 +54,12 @@ Route::get('/prayer-times', [PrayerTimeController::class, 'index']);
 | implementation guidance.
 */
 Route::get('/daily-ayah', [DailyAyahController::class, 'index']);
+
+/*
+|--------------------------------------------------------------------------
+| Blood Donation
+|--------------------------------------------------------------------------
+*/
+Route::post('/blood-donations', [BloodDonationController::class, 'store']);
+Route::get('/blood-donations', [BloodDonationController::class, 'index']);
+
