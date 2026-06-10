@@ -35,9 +35,7 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install Node.js (required for Filament / Vite asset building)
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs
+
 
 # Copy existing application directory contents
 COPY . .
@@ -45,8 +43,6 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Install Node dependencies and build assets
-RUN npm install && npm run build
 
 # Set correct permissions for Laravel directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
