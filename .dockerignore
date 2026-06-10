@@ -1,0 +1,14 @@
+/vendor
+/node_modules
+/public/build
+/storage/*.key
+/storage/logs/*.log
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/.git
+/.env
+/.env.testing
+/phpunit.xml
+/docker-compose.yml
+/tests
